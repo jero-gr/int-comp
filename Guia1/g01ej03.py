@@ -9,7 +9,7 @@ print(str(datetime.datetime.now()) + " Ejecución iniciada")
 
 ### Entrenamiento ###
 
-df_trn = pd.read_csv('Guia1\OR_50_trn.csv')
+df_trn = pd.read_csv('Guia1\OR_90_trn.csv')
 mat_trn = df_trn.to_numpy()
 
 # Inicialización de pesos al azar
@@ -86,15 +86,12 @@ for etp in range(0,etp_max):
     if (err/row < err_max): # Si el porcentaje de errores es menor al criterio
         break               # Salir del bucle for
 
-plt.plot(recta_x1,recta_x2,color="green")
-plt.pause(10)
-
 # Print pesos
 print(str(datetime.datetime.now()) +" Pesos: u="+ str(w[0]) + " w_1=" + str(w[1]) + " w_2=" + str(w[2]))
 
 ### Test ###
 print(str(datetime.datetime.now()) + " Prueba iniciada")
-df_tst = pd.read_csv('Guia1\OR_50_tst.csv')
+df_tst = pd.read_csv('Guia1\OR_90_tst.csv')
 mat_tst = df_tst.to_numpy()
 rows_tst = mat_tst.shape[0]
 
@@ -109,5 +106,8 @@ for i in range(0,rows_tst):
         aciertos = aciertos+1
 
 print(str(datetime.datetime.now()) + " " + str(aciertos) + " aciertos de " + str(rows_tst) + " (" + str((aciertos/rows_tst)*100) + "%)")
+
+plt.plot(recta_x1,recta_x2,color="green")
+plt.pause(10)
 
 print(str(datetime.datetime.now()) + " Ejecución finalizada")
