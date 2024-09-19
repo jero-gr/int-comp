@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 def signo(x):
     if(x<0): return -1
     else: return 1
-def sigmoide(x,b=1):
+def sigmoide(x,b=10):
     return 2 / (1 + np.exp(-b * np.array(x))) - 1
-def ej1(Estructura,str_tst,str_trn): #[2 1]
+def ej2(Estructura,str_tst,str_trn): #[2 1]
     df = pd.read_csv(str_trn)
     arreglo = df.to_numpy()
     row= arreglo.shape[0] # Número de filas del conjunto de datos (número de patrones de entrenamiento)
@@ -35,17 +35,14 @@ def ej1(Estructura,str_tst,str_trn): #[2 1]
             ListaW.append(np.random.uniform(low=-0.5,high=0.5,size=(Estructura[capa],Estructura[capa-1]+1)))
         ListaE.append(np.zeros((Estructura[capa])))
         ListaDelta.append(np.zeros((Estructura[capa])))
-   
-    epoca_max = 200
+    epoca_max = 1500
     err_max = 0.01
-    k = 0.01
-   
+    k = 0.08
     # Plotear cada par de puntos x_1, x_2
-    for i in range(0, row):
+    '''for i in range(0, row):
         if arreglo[i][-1]>0: colr = "blue"   # Azul si y=1
         else: colr = "red"              # Rojo si y=-1
-        plt.plot(arreglo[i][0],arreglo[i][1],marker='o',color=colr,fillstyle="none")
-    
+        plt.plot(arreglo[i][0],arreglo[i][1],marker='o',color=colr,fillstyle="none")'''
     # Entrenamiento de la red neuronal
     for epoca in range(0,epoca_max):
         for i in range(0,row):
@@ -71,9 +68,8 @@ def ej1(Estructura,str_tst,str_trn): #[2 1]
             for capa in range(0,Capas):
                #ListaW[capa] = ListaW[capa] + k * ListaDelta[capa].reshape(-1,1) @ entrada.reshape(-1,1)
                # Actualización de los pesos usando los deltas calculados
-                ListaW[capa] = ListaW[capa] + k * np.outer(ListaDelta[capa], entrada)
+                ListaW[capa] = ListaW[capa] + k * np.outer(ListaDelta[capa], entrada) 
                 entrada = np.hstack((-1, ListaE[capa]))  # Agregar -1 para el sesgo de la siguiente capa
-
         # Evaluación del rendimiento de la red después de cada época 
         # Para cada ejemplo de entrenamiento (patron) medir acierto
         err = 0
@@ -95,18 +91,7 @@ def ej1(Estructura,str_tst,str_trn): #[2 1]
   
     # Imprimir los pesos finales
     print("Los pesos son:", ListaW)
-    
-    # Visualización de las rectas de decisión
-    w = ListaW[0][0]
-    recta_x1 = [-1.1, 1.1]
-    recta_x2 = [w[0]/w[2] - recta_x1[0] * (w[1]/w[2]), w[0]/w[2] - recta_x1[1] * (w[1]/w[2])]
-    plt.plot(recta_x1, recta_x2, color="black")
-    w = ListaW[0][1]
-    recta_x1 = [-1.1, 1.1]
-    recta_x2 = [w[0]/w[2] - recta_x1[0] * (w[1]/w[2]), w[0]/w[2] - recta_x1[1] * (w[1]/w[2])]
-    plt.plot(recta_x1, recta_x2, color="black")
-    plt.show()
-    
+
     # Prueba con el conjunto de datos de prueba
     print(str(datetime.datetime.now()) + " Prueba iniciada")
     df_tst = pd.read_csv(str_tst)  # Cargar el conjunto de prueba
@@ -126,15 +111,26 @@ def ej1(Estructura,str_tst,str_trn): #[2 1]
             #PROPAGACION HACIA ADELANTE
             W = ListaW[capa] #Tengo los W asociados a la capa
             ListaE[capa]= sigmoide((np.dot(W,entrada))) #Matriz de 2x3 y vector de 3x1
-            entrada = np.hstack((-1,ListaE[capa])) #Le agrego el -1 para la entrada del sesgo de la capa siguiente
-       
+            entrada = np.hstack((-1,ListaE[capa])) #Le agrego el -1 para la entrada del sesgo de la capa siguiente      
         y= signo(ListaE[-1])
-        y_tst[i][0] = y
+        y_tst[i] = y
        
         if y == yd[i]:
             aciertos = aciertos+1
     
+    #GRAFICAMOS PUNTOS DE PRUEBA
+    plt.figure(1)
+    for i in range(0, rows_tst):
+        if y_tst[i]>0: colr = "green"   # Amarillo si y=1
+        else: colr = "yellow"              # Verde si y=-1
+        plt.plot(mat_tst[i][0],mat_tst[i][1],marker='o',color=colr,fillstyle="none")
+    plt.figure(2)
+    for i in range(0, rows_tst):
+        if yd[i]>0: colr = "blue"   # Blue si y=1
+        else: colr = "black"              # Negro si y=-1
+        plt.plot(mat_tst[i][0],mat_tst[i][1],marker='o',color=colr,fillstyle="none")
+    plt.show()
     print(str(datetime.datetime.now()) + " " + str(aciertos) + " aciertos de " + str(rows_tst) + " (" + str((aciertos/rows_tst)*100) + "%)")
     print(str(datetime.datetime.now()) + " Ejecución finalizada")
     return 0
-ej1(np.array([2,1]),'Guia1/XOR_tst.csv','Guia1/XOR_trn.csv')
+ej2(np.array([4,2,1]),'Guia2\concent_tst.csv','Guia2\concent_trn.csv')
