@@ -6,95 +6,117 @@ import datetime
 import math
 import matplotlib.pyplot as plt
 
-def A_g(epc):
+# Funcion que a partir de la posición de la neurona ganadora devuelve una matriz booleana con los vecinos afectados
+def vecinos_mat(G_y,G_x,row,col,vec):
+    G_mat = np.zeros((row,col))
+    if G_x<0 or G_x>=col or G_y<0 or G_y>=row:
+        return G_mat
+    for i in range(0,vec+1):
+        y_upp = G_y - vec + i
+        y_low = G_y + vec - i
+
+        x_lef = G_x - i
+        if x_lef<0:
+            x_lef = 0
+
+        x_rig = G_x + i
+        if x_rig >= col:
+            x_rig = col-1
+
+        if y_upp>=0:
+            G_mat[y_upp,x_lef:x_rig+1] = 1
+
+        if y_low<row:
+            G_mat[y_low,x_lef:x_rig+1] = 1
+    return G_mat
+
+# Función para la distancia de vecinos dependiendo de la etapa
+def vec_fun(epc):
     if epc<100:
-        return 3
+        return 4
     elif epc<200:
         return 2
     elif epc<300:
         return 1
     else:
         return 0
-        
+
+# Función para la constante de aprendizaje dependiendo de la etapa
 def mu_fun(epc):
     if epc<100:
         return 0.8
-    elif epc<200:
-        return 2.2 + 0.007*float(epc)
+    elif epc<300:
+        return 1.15 - 0.0035*float(epc)
     else:
         return 0.1
 
-df = pd.read_csv("Guia4/circulo.csv")
+df = pd.read_csv("Guia4/te.csv")
 mat_datos = df.to_numpy()
-datos_row = mat_datos.shape[0] # Número de filas del conjunto de datos (número de patrones de entrenamiento)
-datos_col = mat_datos.shape[1] # Número de filas del conjunto de datos (número de patrones de entrenamiento)
+pat_x, pat_y = mat_datos[:,0],mat_datos[:,1]
+pat_row = len(pat_x)
 
 # Plotear cada par de puntos x_1, x_2
 plt.figure(1)
-for i in range(0, datos_row):
-    plt.plot(mat_datos[i][0],mat_datos[i][1],marker='x',color="gray",fillstyle="none")
+plt.scatter(pat_x,pat_y,marker="x",color="gray")
 
 # Definir constantes
-mu = 0.1
 epc_max = 400
+#mu = 0.2
 
 # Definir arquitectura (distancia Manhattan)
-row = 5
-col = 5
+row = 20
+col = 20
 #vec = 2
 
-mat_neu = [[0 for _ in range(col)] for _ in range(row)] # Matriz de neuronas
-for i in range(0,row):
-    for j in range(0,col):
-        mat_neu[i][j] = np.random.uniform(low=-0.5,high=0.5,size=(1,datos_col)) # Dentro de cada neurona están los pesos
+# Inicializar los pesos de las neuronas
+neu_x = np.random.random((row,col))-0.5
+neu_y = np.random.random((row,col))-0.5
 
 # Plotear la red neuronal
-for i in range(0, row):
-    for j in range(0, col):
-        plt.plot(mat_neu[i][j][0][0],mat_neu[i][j][0][1],marker='o',color="blue",fillstyle="none")
-        if i+1<row: plt.plot([mat_neu[i][j][0][0],mat_neu[i+1][j][0][0]],[mat_neu[i][j][0][1],mat_neu[i+1][j][0][1]],color="blue",linewidth=0.5)
-        if j+1<col: plt.plot([mat_neu[i][j][0][0],mat_neu[i][j+1][0][0]],[mat_neu[i][j][0][1],mat_neu[i][j+1][0][1]],color="blue",linewidth=0.5)
+plt.scatter(neu_x,neu_y,marker="o",color="blue")
+for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
+for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
 
+fi = 0
+# Recorro épocas
 for epc in range(0,epc_max):
-    vec = A_g(epc)
-    #mu = mu_fun(epc)
-    print("Época " + str(epc) + " de " + str(epc_max))
+    vec = vec_fun(epc)
+    mu = mu_fun(epc)
+    print("Época " + str(epc) + " de " + str(epc_max) + ", vec=" + str(vec) + ", mu=" + str(mu))
 
-    for xy in range(0,datos_row):
-        # Obtener el índice de la neurona ganadora
-        G_dif = -(mat_neu - mat_datos[xy][:])
-        G_norm = np.zeros((row,col))
-        for i in range(0,row):
-            for j in range(0,col):
-                G_norm[i][j] = np.linalg.norm(G_dif[i][j])
+    # Recorro patrones
+    for pat in range(0,pat_row):
+        # Diferencias en x y en y para calcular la norma (distancia)
+        dif_x = -(neu_x - pat_x[pat])
+        dif_y = -(neu_y - pat_y[pat])
+        dist = np.sqrt(dif_x * dif_x + dif_y * dif_y)
 
-        argmin_G = np.argmin(G_norm)
-        row_min = np.floor_divide(argmin_G,row)
-        col_min = np.mod(argmin_G,col)
+        # Posición del elemento ganador G y descomposición en fila y columna
+        argmin_dist = np.argmin(dist)
+        G_row = np.floor_divide(argmin_dist,row)
+        G_col = np.mod(argmin_dist,col)
 
         # Actualizar los pesos
-        it = 2*vec+1    # Cantidad de iteraciones dependiendo de la vecindad
-        for i in range(0,vec):
-            for j in range(-i,i+1):
-                if row_min-vec+i>=0 and col_min+j>=0 and col_min+j<col:
-                    mat_neu[row_min-vec+i][col_min+j] = mat_neu[row_min-vec+i][col_min+j] + mu * G_dif[row_min-vec+i][col_min+j]
-                if row_min+vec-i<row and col_min+j>=0 and col_min+j<col:
-                    mat_neu[row_min+vec-i][col_min+j] = mat_neu[row_min+vec-i][col_min+j] + mu * G_dif[row_min+vec-i][col_min+j]
-        for i in range(-vec,vec+1):
-            if col_min+i>=0 and col_min+i<col:
-                mat_neu[row_min][col_min+i] = mat_neu[row_min][col_min+i] + mu * G_dif[row_min][col_min+i]
+        # función que devuelve una matriz donde 1 son los vecinos afectados y 0 son los elementos no afectados
+        G_mat = vecinos_mat(G_row,G_col,row,col,vec)
+        neu_x = neu_x + mu * (G_mat * dif_x)
+        neu_y = neu_y + mu * (G_mat * dif_y)
     
-plt.figure(2)
-# Plotear cada par de puntos x_1, x_2
-for i in range(0, datos_row):
-    plt.plot(mat_datos[i][0],mat_datos[i][1],marker='x',color="gray",fillstyle="none")
-
-# Plotear la red neuronal
-for i in range(0, row):
-    for j in range(0, col):
-        plt.plot(mat_neu[i][j][0][0],mat_neu[i][j][0][1],marker='o',color="blue",fillstyle="none")
-        if i+1<row: plt.plot([mat_neu[i][j][0][0],mat_neu[i+1][j][0][0]],[mat_neu[i][j][0][1],mat_neu[i+1][j][0][1]],color="blue",linewidth=0.5)
-        if j+1<col: plt.plot([mat_neu[i][j][0][0],mat_neu[i][j+1][0][0]],[mat_neu[i][j][0][1],mat_neu[i][j+1][0][1]],color="blue",linewidth=0.5)
-
-plt.show()
-    
+    # Cada 10 épocas guardar plot
+    if np.mod(epc,10)==0:
+        plt.figure(2)
+        plt.clf()
+        # Plotear cada par de puntos x_1, x_2
+        plt.scatter(pat_x,pat_y,marker="x",color="gray")
+        # Plotear la red neuronal
+        plt.scatter(neu_x,neu_y,marker="o",color="blue")
+        for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
+        for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
+        # Guardar plot
+        fi_ = str(fi)
+        if fi<10:
+            fi_ = "0" + fi_
+        filename = "Guia4/g04ej01/gif_" + fi_
+        plt.title("Epoca " + str(epc) + " de " + str(epc_max))
+        plt.savefig(filename)
+        fi = fi+1
