@@ -33,11 +33,13 @@ def vecinos_mat(G_y,G_x,row,col,vec):
 # Función para la distancia de vecinos dependiendo de la etapa
 def vec_fun(epc):
     if epc<100:
-        return 4
+        return 100
     elif epc<200:
-        return 2
+        return 10
     elif epc<300:
-        return 1
+        return 5
+    elif epc<400:
+        return 2
     else:
         return 0
 
@@ -50,7 +52,7 @@ def mu_fun(epc):
     else:
         return 0.1
 
-df = pd.read_csv("Guia4/te.csv")
+df = pd.read_csv("Guia4/circulo.csv")
 mat_datos = df.to_numpy()
 pat_x, pat_y = mat_datos[:,0],mat_datos[:,1]
 pat_row = len(pat_x)
@@ -60,12 +62,15 @@ plt.figure(1)
 plt.scatter(pat_x,pat_y,marker="x",color="gray")
 
 # Definir constantes
-epc_max = 400
+epc_max = 500
 #mu = 0.2
 
+# Definir si se guarda el GIF
+save_gif = 1
+
 # Definir arquitectura (distancia Manhattan)
-row = 20
-col = 20
+row = 1
+col = 400
 #vec = 2
 
 # Inicializar los pesos de las neuronas
@@ -74,8 +79,10 @@ neu_y = np.random.random((row,col))-0.5
 
 # Plotear la red neuronal
 plt.scatter(neu_x,neu_y,marker="o",color="blue")
-for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
-for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
+if col>1:
+    for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
+if row>1:
+    for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
 
 fi = 0
 # Recorro épocas
@@ -83,9 +90,31 @@ for epc in range(0,epc_max):
     vec = vec_fun(epc)
     mu = mu_fun(epc)
     print("Época " + str(epc) + " de " + str(epc_max) + ", vec=" + str(vec) + ", mu=" + str(mu))
+    if save_gif==1:
+        plt.figure(2)
+        plt.clf()
+        # Plotear cada par de puntos x_1, x_2
+        plt.scatter(pat_x,pat_y,marker="x",color="gray")
+        # Plotear la red neuronal
+        plt.scatter(neu_x,neu_y,marker="o",color="blue")
+        if col>1:
+            for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
+        if row>1:
+            for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
+        # Guardar plot
+        fi_ = str(fi)
+        if fi<10:
+            fi_ = "0" + fi_
+        if fi<100:
+            fi_ = "0" + fi_
+        filename = "Guia4/g04ej01/gif_" + fi_
+        plt.title("Epoca " + str(epc) + " de " + str(epc_max))
+        plt.savefig(filename)
+        fi = fi+1
 
     # Recorro patrones
     for pat in range(0,pat_row):
+
         # Diferencias en x y en y para calcular la norma (distancia)
         dif_x = -(neu_x - pat_x[pat])
         dif_y = -(neu_y - pat_y[pat])
@@ -98,25 +127,13 @@ for epc in range(0,epc_max):
 
         # Actualizar los pesos
         # función que devuelve una matriz donde 1 son los vecinos afectados y 0 son los elementos no afectados
+        if row==1:
+            G_row=0
+        if col==1:
+            G_col=0
+
         G_mat = vecinos_mat(G_row,G_col,row,col,vec)
         neu_x = neu_x + mu * (G_mat * dif_x)
         neu_y = neu_y + mu * (G_mat * dif_y)
-    
-    # Cada 10 épocas guardar plot
-    if np.mod(epc,10)==0:
-        plt.figure(2)
-        plt.clf()
-        # Plotear cada par de puntos x_1, x_2
-        plt.scatter(pat_x,pat_y,marker="x",color="gray")
-        # Plotear la red neuronal
-        plt.scatter(neu_x,neu_y,marker="o",color="blue")
-        for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
-        for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
-        # Guardar plot
-        fi_ = str(fi)
-        if fi<10:
-            fi_ = "0" + fi_
-        filename = "Guia4/g04ej01/gif_" + fi_
-        plt.title("Epoca " + str(epc) + " de " + str(epc_max))
-        plt.savefig(filename)
-        fi = fi+1
+
+plt.show()

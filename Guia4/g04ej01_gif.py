@@ -23,4 +23,4 @@ for x in range(0, 9):
 
 # save as a gif   
 images[0].save('Guia4\g04ej01\gif' + timestr + '.gif',
-               save_all=True, append_images=images[1:], optimize=False, duration=500, loop=0)
+               save_all=True, append_images=images[1:], optimize=False, duration=50, loop=0)
