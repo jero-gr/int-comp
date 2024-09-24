@@ -4,8 +4,11 @@ import numpy as np
 import datetime
 import math
 import matplotlib.pyplot as plt
+# Comparación con otras etiquetas o generación de matriz de contingencia
+from sklearn.metrics.cluster import contingency_matrix
+from g04ej01_aux import som_labels
 
-df = pd.read_csv('Guia4/irisbin_trn.csv')
+df = pd.read_csv('irisbin_tst.csv')
 arreglo = df.to_numpy()
 row= arreglo.shape[0] # Número de filas del conjunto de datos (número de patrones de entrenamiento)
 # Separar las entradas x y los resultados esperados yd
@@ -93,3 +96,13 @@ print((x[x[:, -1] == 0]).shape[0],(x[x[:, -1] == 1]).shape[0],(x[x[:, -1] == 2])
 print("Clasificacion correcta: [34 32 45]")
 
 plt.show()
+
+# Llamar a la función som_labels()
+labels_som = som_labels()
+
+# Usar las etiquetas generadas para análisis o comparación
+print("Etiquetas generadas por SOM:", labels_som)
+
+matrix = contingency_matrix(x[:, -1], labels_som)
+print("Matriz de contingencia :\n", matrix)
+
