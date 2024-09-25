@@ -4,7 +4,7 @@ from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 
 # Cargar el dataset Iris
-df = pd.read_csv('irisbin_trn.csv')
+df = pd.read_csv('Guia4/irisbin_trn.csv')
 arreglo = df.to_numpy()
 x = arreglo[: , :-3] 
 
@@ -50,7 +50,6 @@ plt.ylabel('Puntaje de silueta')
 
 plt.tight_layout()
 plt.show()
-
 # Imprimir el mejor valor de k según el puntaje de silueta
 best_k = k_values[silhouette_scores.index(max(silhouette_scores))]
 print(f"El valor óptimo de k es: {best_k}")

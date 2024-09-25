@@ -33,59 +33,39 @@ def som_labels():
 
     # Función para la distancia de vecinos dependiendo de la etapa
     def vec_fun(epc):
-        if epc<100:
-            return 100
-        elif epc<200:
-            return 10
-        elif epc<300:
-            return 5
-        elif epc<400:
+        if epc<50:
             return 2
+        elif epc<200:
+            return 1
         else:
             return 0
 
     # Función para la constante de aprendizaje dependiendo de la etapa
     def mu_fun(epc):
-        if epc<100:
+        if epc<50:
             return 0.8
-        elif epc<300:
+        elif epc<200:
             return 1.15 - 0.0035*float(epc)
         else:
             return 0.1
 
-    df = pd.read_csv("irisbin_tst.csv")
+    df = pd.read_csv("Guia4/irisbin_trn.csv")
     mat_datos = df.to_numpy()
     pat_x, pat_y = mat_datos[:,0],mat_datos[:,1]
     pat_row = len(pat_x)
 
-    # Plotear cada par de puntos x_1, x_2
-    plt.figure(1)
-    plt.scatter(pat_x,pat_y,marker="x",color="gray")
-
     # Definir constantes
-    epc_max = 500
+    epc_max = 300
     #mu = 0.2
 
-    # Definir si se guarda el GIF
-    save_gif = 0
-
     # Definir arquitectura (distancia Manhattan)
-    row = 5
-    col = 5
+    row = 7
+    col = 7
     #vec = 2
 
     # Inicializar los pesos de las neuronas
     neu_x = np.random.random((row,col))-0.5
     neu_y = np.random.random((row,col))-0.5
-
-    # Plotear la red neuronal
-    plt.scatter(neu_x,neu_y,marker="o",color="blue")
-    if col>1:
-        for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
-    if row>1:
-        for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
-
-    fi = 0
 
     # Inicializar etiquetas SOM
     som_labels = np.zeros(pat_row)
@@ -94,32 +74,9 @@ def som_labels():
     for epc in range(0,epc_max):
         vec = vec_fun(epc)
         mu = mu_fun(epc)
-        print("Época " + str(epc) + " de " + str(epc_max) + ", vec=" + str(vec) + ", mu=" + str(mu))
-        if save_gif==1:
-            plt.figure(2)
-            plt.clf()
-            # Plotear cada par de puntos x_1, x_2
-            plt.scatter(pat_x,pat_y,marker="x",color="gray")
-            # Plotear la red neuronal
-            plt.scatter(neu_x,neu_y,marker="o",color="blue")
-            if col>1:
-                for i in range(0, row): plt.plot(neu_x[i,:],neu_y[i,:],color="blue",marker="")
-            if row>1:
-                for j in range(0, col): plt.plot(neu_x[:,j],neu_y[:,j],color="blue",marker="")
-            # Guardar plot
-            fi_ = str(fi)
-            if fi<10:
-                fi_ = "0" + fi_
-            if fi<100:
-                fi_ = "0" + fi_
-            filename = "Guia4/g04ej01/gif_" + fi_
-            plt.title("Epoca " + str(epc) + " de " + str(epc_max))
-            plt.savefig(filename)
-            fi = fi+1
-
+        #print("Época " + str(epc) + " de " + str(epc_max) + ", vec=" + str(vec) + ", mu=" + str(mu))
         # Recorro patrones
         for pat in range(0,pat_row):
-
             # Diferencias en x y en y para calcular la norma (distancia)
             dif_x = -(neu_x - pat_x[pat])
             dif_y = -(neu_y - pat_y[pat])
@@ -143,5 +100,4 @@ def som_labels():
             G_mat = vecinos_mat(G_row,G_col,row,col,vec)
             neu_x = neu_x + mu * (G_mat * dif_x)
             neu_y = neu_y + mu * (G_mat * dif_y)
-    plt.show()
-    return som_labels
+    return som_labels,neu_x,neu_y

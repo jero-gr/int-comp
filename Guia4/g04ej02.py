@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics.cluster import contingency_matrix
 from g04ej01_aux import som_labels
 
-df = pd.read_csv('irisbin_tst.csv')
+df = pd.read_csv('Guia4/irisbin_trn.csv')
 arreglo = df.to_numpy()
 row= arreglo.shape[0] # Número de filas del conjunto de datos (número de patrones de entrenamiento)
 # Separar las entradas x y los resultados esperados yd
@@ -33,7 +33,7 @@ x = np.hstack((x,columna))
 epoc=0
 
 while epoc < 500:
-    print("Época " + str(epoc))
+    #print("Época " + str(epoc))
     bandera = False
     for patron in range(0,row):
         pat = x[patron,:-1]
@@ -92,17 +92,16 @@ plt.title("LongP - AnchoP")
 plt.scatter(x[:,longP], x[:,anchoP], c=color_scat, marker="o",s=5)
 plt.scatter(centroide[:,longP], centroide[:,anchoP],  c="black", marker="D")
 
-print((x[x[:, -1] == 0]).shape[0],(x[x[:, -1] == 1]).shape[0],(x[x[:, -1] == 2]).shape[0])
+print("Clasificacion del K-medias",(x[x[:, -1] == 0]).shape[0],(x[x[:, -1] == 1]).shape[0],(x[x[:, -1] == 2]).shape[0])
 print("Clasificacion correcta: [34 32 45]")
 
 plt.show()
 
 # Llamar a la función som_labels()
-labels_som = som_labels()
+labels_som,Wx,Wy = som_labels()
 
 # Usar las etiquetas generadas para análisis o comparación
 print("Etiquetas generadas por SOM:", labels_som)
-
 matrix = contingency_matrix(x[:, -1], labels_som)
 print("Matriz de contingencia :\n", matrix)
 

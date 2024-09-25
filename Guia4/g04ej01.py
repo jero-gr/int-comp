@@ -66,7 +66,7 @@ epc_max = 500
 #mu = 0.2
 
 # Definir si se guarda el GIF
-save_gif = 1
+save_gif = 0
 
 # Definir arquitectura (distancia Manhattan)
 row = 1
