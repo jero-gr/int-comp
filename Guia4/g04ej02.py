@@ -15,7 +15,7 @@ row= arreglo.shape[0] # Número de filas del conjunto de datos (número de patro
 x = arreglo[: , :-3]  #Dejo solo las entradas en una matrix
 yd = arreglo[:, -3 :] #Dejo los resultados esperados en un vector
 cantentradas = x.shape[1]
-k=3
+k=6
 
 clase_set = arreglo[:,-3]
 clase_ver = arreglo[:,-2]
