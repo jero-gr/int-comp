@@ -6,9 +6,9 @@ import datetime
 import math
 import matplotlib.pyplot as plt
 from sklearn.metrics.cluster import contingency_matrix
-from g04ej01_aux import som_labels
+from g04ej01_n import som_labels
 
-df = pd.read_csv("Guia2/irisbin_trn.csv")
+df = pd.read_csv("Guia4/irisbin_trn.csv")
 mat_datos = df.to_numpy()
 mat_row = len(mat_datos)
 
@@ -38,7 +38,7 @@ ax.scatter3D(pat[:,col_x], pat[:,col_y], pat[:,col_z], c=color_scat, marker="o",
 
 # Definir constantes
 epc_max = 100
-k_row = 6
+k_row = 2
 ent_col = np.shape(pat)[1]-1
 tol = 0.000000001
 
@@ -97,11 +97,11 @@ for epc in range(0,epc_max):
     for j in range(0,k_row):
         dist_abs[j] = np.sqrt(np.dot(dif_cent[j,:],dif_cent[j,:]))
 
-    print("Época " + str(epc) + " de " + str(epc_max) + ", dist_abs=" + str(np.sum(dist_abs)))
+    #print("Época " + str(epc) + " de " + str(epc_max) + ", dist_abs=" + str(np.sum(dist_abs)))
     if np.sum(dist_abs)<tol:
         break
 
-print(cent)
+#print(cent)
 
 # Plotear de nuevo
 #fig = plt.figure(2)
@@ -143,15 +143,15 @@ axs[1,1].scatter(cent[:,anchoS], cent[:,anchoP],  c="black", marker="D")
 axs[1,2].scatter(pat[:,longP], pat[:,anchoP], c=color_scat, marker="o",s=5)
 axs[1,2].scatter(cent[:,longP], cent[:,anchoP],  c="black", marker="D")'''
 
-print("Clasificacion del K-medias",(pat[pat[:, -1] == 0]).shape[0],(pat[pat[:, -1] == 1]).shape[0],(pat[pat[:, -1] == 2]).shape[0])
+'''print("Clasificacion del K-medias",(pat[pat[:, -1] == 0]).shape[0],(pat[pat[:, -1] == 1]).shape[0],(pat[pat[:, -1] == 2]).shape[0])
 print("Clasificacion correcta: [34 32 45]")
 
-# Llamar a la función som_labels()
-labels_som,Wx,Wy = som_labels()
+#Llamar a la función som_labels()
+labels_som = som_labels()
 
 # Usar las etiquetas generadas para análisis o comparación
 print("Etiquetas generadas por SOM:", labels_som)
 mat_cont = contingency_matrix(pat[:, -1], labels_som)
 print("Matriz de contingencia :\n", mat_cont)
-
+'''
 plt.show()

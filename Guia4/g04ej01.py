@@ -103,8 +103,8 @@ plot_bool = False
 save_gif = 0
 
 # Definir arquitectura (distancia Manhattan)
-row = 50
-col = 50
+row = 5
+col = 5
 #vec = 2
 
 # Inicializar los pesos de las neuronas
