@@ -33,7 +33,7 @@ def algoritmo(num_particulas, mins, maxs, funcion_error, c1, c2, max_iteraciones
             r1 = np.random.rand()  # Componente aleatoria para el peso personal
             r2 = np.random.rand()  # Componente aleatoria para el peso global
             
-            # Actualización de la velocidad (ahora para múltiples dimensiones)
+            # Actualización de la velocidad 
             velocidades[i] = (velocidades[i] + 
                               c1_actual * r1 * (mejor_pos_personal[i] - posiciones[i]) +  # Influencia personal
                               c2_actual * r2 * (mejor_pos_global - posiciones[i]))  # Influencia global
