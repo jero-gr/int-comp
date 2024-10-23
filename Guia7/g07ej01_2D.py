@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 # Función para inicializar el enjambre aleatorio con velocidades iniciales nulas
 def enjambre(num_particulas, mins, maxs):
@@ -8,7 +9,7 @@ def enjambre(num_particulas, mins, maxs):
     return posiciones, velocidades, mejor_pos_personal
 
 def algoritmo(num_particulas, mins, maxs, funcion, c1, c2, max_iteraciones, tolerancia):
-
+    inicio = time.perf_counter() 
     # Inicializamos el enjambre
     posiciones, velocidades, mejor_pos_personal = enjambre(num_particulas, mins, maxs)
   
@@ -18,6 +19,9 @@ def algoritmo(num_particulas, mins, maxs, funcion, c1, c2, max_iteraciones, tole
     # Inicializamos la mejor posición global
     mejor_pos_global = mejor_pos_personal[np.argmin(valores_error_personal)]
     mejor_error_global = np.min(valores_error_personal)
+
+    # Guardar el error global de la iteración anterior para la condición de convergencia
+    mejor_error_anterior = mejor_error_global
 
     c1_inicial, c1_final = c1
     c2_inicial, c2_final = c2
@@ -53,7 +57,17 @@ def algoritmo(num_particulas, mins, maxs, funcion, c1, c2, max_iteraciones, tole
         if mejor_error_iteracion < mejor_error_global:
             mejor_error_global = mejor_error_iteracion
             mejor_pos_global = mejor_pos_personal[np.argmin(valores_error_personal)]
-    
+
+        # Comprobación de la condición de convergencia (tolerancia)
+        if abs(mejor_error_anterior - mejor_error_global) < tolerancia:
+            fin = time.perf_counter()
+            print(f'Tiempo de convergencia {fin - inicio} segundos.') 
+            print(f"Iteraciones{iteracion + 1}.")
+            break    
+
+        # Actualizamos el valor del mejor error anterior para la siguiente iteración
+        mejor_error_anterior = mejor_error_global
+
     return mejor_pos_global
 
 #############################
@@ -68,14 +82,14 @@ y = np.linspace(-100, 100, 1000)
 print(f'El mínimo de la función está en ({x[np.argmin(f2(x,y))]},{y[np.argmin(f2(x,y))]},{np.min(f2(x,y))})')
 
 # Parámetros para el algoritmo
-num_particulas = 70
+num_particulas = 100
 mins = [-100, -100]  # Rango de búsqueda para cada dimensión en 2D
 maxs = [100, 100]
 
 c1 = [2.5, 0.5]  # c1 dinámico (de 2.5 a 0.5)
 c2 = [0.5, 2.5]  # c2 dinámico (de 0.5 a 2.5)
 max_iteraciones = 100
-tolerancia = 0.001
+tolerancia = 0.1 #Una tolerancia más alta permite que el algoritmo continúe explorando durante más tiempo antes de detenerse, lo que podría ayudar a escapar de mínimos locales
 funcion = f2
 
 # Ejecutar el algoritmo PSO para la función en 2D
@@ -85,6 +99,6 @@ mejor_solucion = algoritmo(num_particulas, mins, maxs, funcion, c1, c2, max_iter
 mejor_valor = funcion(mejor_solucion[0], mejor_solucion[1])
 
 # Mostrar resultados
-print(f"\n### Resultados del Algoritmo PSO en 2D ###")
-print(f"Mejor solución encontrada en x = {mejor_solucion[0]:.4f}, y = {mejor_solucion[1]:.4f}")
-print(f"Valor de la función en la mejor solución: {mejor_valor:.4f}")
+#print(f"\n### Resultados del Algoritmo PSO en 2D ###")
+#print(f"Mejor solución encontrada en x = {mejor_solucion[0]:.4f}, y = {mejor_solucion[1]:.4f}")
+print(f"Minimo: {mejor_valor}")
