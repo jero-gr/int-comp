@@ -110,7 +110,7 @@ def algoritmo(matriz_distancias, feromonas, posiciones_hormigas, max_iteraciones
 
     for iteracion in range(max_iteraciones):
        
-        print(f"\nIteración: {iteracion + 1}")
+        #print(f"\nIteración: {iteracion + 1}")
         caminos_anterior_iteracion = caminos.copy()  # Guardamos los caminos de la iteración anterior
         longitudes = []
        
@@ -127,7 +127,7 @@ def algoritmo(matriz_distancias, feromonas, posiciones_hormigas, max_iteraciones
             caminos[i] = ciudades_visitadas
             longitud_camino = calcular_longitud_camino(ciudades_visitadas, matriz_distancias)
             longitudes.append(longitud_camino)
-            print(f"Hormiga {i + 1}: Longitud: {longitud_camino}")     
+            #print(f"Hormiga {i + 1}: Longitud: {longitud_camino}")     
 
         # Actualización de feromonas según el tipo seleccionado
         if tipo_actualizacion == 'global':
@@ -172,7 +172,7 @@ def algoritmo(matriz_distancias, feromonas, posiciones_hormigas, max_iteraciones
 
 
 # Cargar la matriz de distancias desde el archivo CSV
-df = pd.read_csv("gr17.csv",header=None)
+df = pd.read_csv("Guia7/gr17.csv",header=None)
 matriz_distancias = df.to_numpy()
 
 #print(matriz_distancias)

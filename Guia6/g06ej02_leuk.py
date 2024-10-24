@@ -65,7 +65,7 @@ num_bits = 7129
 size_pob = 51
 poblacion = np.zeros((size_pob,num_bits))
 for i in range(0,size_pob):
-    cant_rand = np.random.randint(low=30,high=100)
+    cant_rand = np.random.randint(low=10,high=50)
     pos_rand = np.random.randint(low=0,high=num_bits,size=cant_rand)
     poblacion[i,pos_rand] = 1
 
@@ -91,9 +91,10 @@ for i in range(0,size_pob):
     svc_accuracy = svc_class.score(x_tst,y_tst)
     x = len(indexes)
     aptitud[i] = svc_accuracy*sigmoide(x)
+    print(svc_accuracy)
 
 
-#print(aptitud)
+print(aptitud)
 
 
 # Variables y constantes
@@ -130,7 +131,7 @@ for it in range(0,maxit):
             svc_class.fit(x_trn,y_trn)
             svc_accuracy = svc_class.score(x_tst,y_tst)
             x = len(indexes)
-            aptitud[i] = svc_accuracy*sigmoide(x)
+            aptitud[i] = svc_accuracy#*sigmoide(x)
 
     if elit == elit_prev:
         cont += 1
