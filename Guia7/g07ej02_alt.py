@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 
 # Funciones
 def prob_ij(D,tabu,alpha,beta,sigma,i):
@@ -39,16 +40,20 @@ D_row = len(D)
 # Sistema de hormigas
 
 # Constantes y variables
-N = 30      # Cantidad de hormigas
+N = 20      # Cantidad de hormigas
 origen = 0    # Nodo origen
-it_max = 1500
-rho = 0.5
+it_max = 10000
+rho = 0.01
 Q = 1
-metodo = 'L' # G=global, U=uniforme, L=local
+metodo = 'G' # G=global, U=uniforme, L=local
+count_equal = 0
+
+t_ini = time.perf_counter()
 
 # 1. En t=0 se inicializan las feromonas con valores pequeños al azar
 sigma_0 = 0.5
-sigma = np.random.random((D_row,D_row))*sigma_0
+#sigma = np.random.random((D_row,D_row))*sigma_0
+sigma = np.ones((D_row,D_row))*sigma_0
 
 # 2. Se ubican las N hormigas en el nodo origen.
 ant_path = []
@@ -60,8 +65,7 @@ ant_dist = np.zeros(N)
 # 3. Repetir hasta que todas las hormigas sigan el mismo camino:
 for it in range(0,it_max):
 
-    print('Iteración ' + str(it) + ', sum(sigma)=' + str(np.sum(sigma)))
-
+    #print('Iteración ' + str(it) + ', sum(sigma)=' + str(np.sum(sigma)))
 #   3.1. Para cada hormiga
     for k in range(0,N):
 
@@ -129,11 +133,22 @@ for it in range(0,it_max):
     # Si todas las hormigas tienen el mismo camino, 
 
     if dist_equal(ant_dist) == True:
-        print('Iteración ' + str(it))
-        print('Se llegó al camino.')
-        break
+        #print('Iteración ' + str(it))
+        count_equal += 1
+        if count_equal==5:
+            print('Se llegó al camino en ' + str(it) + ' iteraciones.')
+            break
+    else:
+        count_equal = 0
 
 # 4. Devolver el camino más corto
+
+t_fin = time.perf_counter()
+
 indx = np.argmin(ant_dist)
+print('rho=' + str(rho))
+print('Q=' + str(Q))
+print(metodo)
 print(ant_path[indx])
 print(ant_dist[indx])
+print(t_fin-t_ini)
